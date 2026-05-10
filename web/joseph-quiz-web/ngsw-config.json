@@ -1,0 +1,68 @@
+{
+  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "resources": {
+        "files": [
+          "/favicon.ico",
+          "/index.html",
+          "/manifest.webmanifest",
+          "/*.css",
+          "/*.js"
+        ]
+      }
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": [
+          "/assets/**/*.(svg|jpg|jpeg|png|webp|avif|gif)",
+          "/icons/**/*.(png|svg)"
+        ]
+      }
+    }
+  ],
+  "dataGroups": [
+    {
+      "name": "api-questions",
+      "urls": [
+        "/api/questions/**",
+        "/api/quiz/**",
+        "http://localhost:5099/questions/**",
+        "http://localhost:5099/quiz/**",
+        "https://joseph-quiz-api.onrender.com/questions/**",
+        "https://joseph-quiz-api.onrender.com/quiz/**"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 50,
+        "maxAge": "2d",
+        "timeout": "5s"
+      }
+    },
+    {
+      "name": "api-profile",
+      "urls": [
+        "/api/profile/**",
+        "/api/leaderboard**",
+        "/api/teams/**",
+        "http://localhost:5099/profile/**",
+        "http://localhost:5099/leaderboard**",
+        "http://localhost:5099/teams/**",
+        "https://joseph-quiz-api.onrender.com/profile/**",
+        "https://joseph-quiz-api.onrender.com/leaderboard**",
+        "https://joseph-quiz-api.onrender.com/teams/**"
+      ],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxSize": 20,
+        "maxAge": "1d"
+      }
+    }
+  ]
+}

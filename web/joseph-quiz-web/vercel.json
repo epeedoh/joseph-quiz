@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/joseph-quiz-web/browser",
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://joseph-quiz-api.onrender.com/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

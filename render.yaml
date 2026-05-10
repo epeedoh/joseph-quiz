@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: joseph-quiz-api
+    env: docker
+    rootDir: .
+    dockerfilePath: ./src/JosephQuiz.Api/Dockerfile
+    autoDeploy: true
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: Cors__AllowedOrigins__0
+        value: https://joseph-quiz.vercel.app
+      - key: Cors__AllowedOrigins__1
+        value: http://localhost:4200

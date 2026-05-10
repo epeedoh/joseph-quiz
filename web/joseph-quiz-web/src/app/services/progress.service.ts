@@ -1,0 +1,160 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable, computed, inject, signal } from '@angular/core';
+
+import { environment } from '../../environments/environment';
+import { OfflineCacheService } from './offline-cache.service';
+import { ProfileSummary, QuizResult } from '../core/models/quiz.models';
+
+const PSEUDO_KEY = 'jq:pseudo';
+const LEGACY_PROFILE_KEY = 'jq:profile';
+const PROFILE_KEY_PREFIX = 'jq:profile:';
+
+@Injectable({ providedIn: 'root' })
+export class ProgressService {
+  private readonly http = inject(HttpClient);
+  private readonly offlineCache = inject(OfflineCacheService);
+
+  readonly pseudo = signal<string>(localStorage.getItem(PSEUDO_KEY) ?? '');
+  readonly profile = signal<ProfileSummary | null>(null);
+  readonly loading = signal(false);
+  readonly online = signal(navigator.onLine);
+
+  readonly tuniqueProgress = computed(() => {
+    const profile = this.profile();
+    if (!profile) {
+      return 0;
+    }
+
+    if (profile.totalXp <= 100) {
+      return profile.totalXp;
+    }
+
+    if (profile.totalXp <= 300) {
+      return ((profile.totalXp - 101) / 199) * 100;
+    }
+
+    if (profile.totalXp <= 600) {
+      return ((profile.totalXp - 301) / 299) * 100;
+    }
+
+    return Math.min(100, ((profile.totalXp - 601) / 500) * 100);
+  });
+
+  constructor() {
+    window.addEventListener('online', () => this.online.set(true));
+    window.addEventListener('offline', () => this.online.set(false));
+
+    if (this.pseudo()) {
+      void this.loadProfile();
+    }
+  }
+
+  setPseudo(pseudo: string): void {
+    const normalized = pseudo.trim();
+    if (!normalized) {
+      localStorage.removeItem(PSEUDO_KEY);
+      this.pseudo.set('');
+      this.profile.set(null);
+      return;
+    }
+
+    localStorage.setItem(PSEUDO_KEY, normalized);
+    this.pseudo.set(normalized);
+
+    const currentProfile = this.profile();
+    if (!currentProfile || currentProfile.pseudo.toLowerCase() !== normalized.toLowerCase()) {
+      const placeholder = this.createEmptyProfile(normalized);
+      this.profile.set(placeholder);
+      void this.offlineCache.write(this.profileKey(normalized), placeholder);
+    }
+  }
+
+  async loadProfile(): Promise<void> {
+    const currentPseudo = this.pseudo().trim();
+    if (!currentPseudo) {
+      return;
+    }
+
+    this.loading.set(true);
+    const cacheKey = this.profileKey(currentPseudo);
+
+    try {
+      const profile = await this.http
+        .get<ProfileSummary>(`${environment.apiBaseUrl}/profile/${encodeURIComponent(currentPseudo)}`)
+        .toPromise();
+
+      const resolvedProfile = profile ?? this.createEmptyProfile(currentPseudo);
+      this.profile.set(resolvedProfile);
+      await this.offlineCache.write(cacheKey, resolvedProfile);
+    } catch {
+      const cachedProfile = await this.readCachedProfile(currentPseudo);
+      if (cachedProfile) {
+        this.profile.set(cachedProfile);
+      } else {
+        const placeholder = this.createEmptyProfile(currentPseudo);
+        this.profile.set(placeholder);
+        await this.offlineCache.write(cacheKey, placeholder);
+      }
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  async applyOptimisticResult(result: QuizResult): Promise<void> {
+    const current = this.profile();
+    if (!current) {
+      await this.loadProfile();
+      return;
+    }
+
+    const updated: ProfileSummary = {
+      ...current,
+      totalXp: current.totalXp + result.xpEarned,
+      totalScore: current.totalScore + result.score,
+      bestCombo: Math.max(current.bestCombo, result.maxCombo),
+      levelTitle: result.levelTitle,
+      badge: result.badge,
+      recommendations: result.recommendations,
+      recentScores: current.recentScores
+    };
+
+    this.profile.set(updated);
+    await this.offlineCache.write(this.profileKey(updated.pseudo), updated);
+  }
+
+  private profileKey(pseudo: string): string {
+    return `${PROFILE_KEY_PREFIX}${pseudo.trim().toLowerCase()}`;
+  }
+
+  private async readCachedProfile(pseudo: string): Promise<ProfileSummary | null> {
+    const profileKey = this.profileKey(pseudo);
+    const cachedProfile = await this.offlineCache.read<ProfileSummary>(profileKey);
+    if (cachedProfile) {
+      return cachedProfile;
+    }
+
+    const legacyProfile = await this.offlineCache.read<ProfileSummary>(LEGACY_PROFILE_KEY);
+    if (legacyProfile?.pseudo.trim().toLowerCase() === pseudo.trim().toLowerCase()) {
+      await this.offlineCache.write(profileKey, legacyProfile);
+      return legacyProfile;
+    }
+
+    return null;
+  }
+
+  private createEmptyProfile(pseudo: string): ProfileSummary {
+    return {
+      pseudo,
+      totalXp: 0,
+      totalScore: 0,
+      levelTitle: 'Reveur Novice',
+      badge: '🥉 Reveur',
+      accuracy: 0,
+      averageResponseTimeMs: 0,
+      bestCombo: 0,
+      teamName: null,
+      recommendations: [],
+      recentScores: []
+    };
+  }
+}

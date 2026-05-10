@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-parchment font-body text-ink antialiased;
+  background-image:
+    radial-gradient(circle at top left, rgba(216, 178, 63, 0.18), transparent 24%),
+    radial-gradient(circle at bottom right, rgba(13, 109, 113, 0.14), transparent 24%),
+    linear-gradient(180deg, #fbf8f1 0%, #f3eee1 100%);
+}
+
+.glass-card {
+  @apply rounded-[30px] border border-white/60 bg-white/75 shadow-card backdrop-blur-xl;
+}
+
+.section-title {
+  @apply font-display text-2xl tracking-[0.18em] text-royal sm:text-3xl;
+}
+
+.gold-chip {
+  @apply inline-flex items-center rounded-full bg-gold/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-gold;
+}
+
+.tunique-bar {
+  background: linear-gradient(90deg, #d8b23f 0%, #efca5a 24%, #0d6d71 52%, #1f3f8f 76%, #9f2333 100%);
+  background-size: 200% 100%;
+}

@@ -1,0 +1,4 @@
+[22:11:48 INF] Les questions Joseph Quiz existent déjà. Aucun seed nécessaire.
+[22:11:48 INF] JOSEPH QUIZ API initialisée.
+[22:17:29 INF] HTTP GET /health responded 200 in 6936.4486 ms
+[22:20:11 INF] HTTP POST /quiz/custom responded 200 in 14438.5002 ms

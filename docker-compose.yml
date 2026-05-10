@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: josephquiz-postgres
+    environment:
+      POSTGRES_DB: josephquiz
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - josephquiz-postgres:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: .
+      dockerfile: src/JosephQuiz.Api/Dockerfile
+    container_name: josephquiz-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=josephquiz;Username=postgres;Password=postgres
+      Cors__AllowedOrigins__0: http://localhost:8080
+      Cors__AllowedOrigins__1: http://localhost:4200
+    ports:
+      - "5099:10000"
+    depends_on:
+      - postgres
+
+  web:
+    build:
+      context: web/joseph-quiz-web
+      dockerfile: Dockerfile
+    container_name: josephquiz-web
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+volumes:
+  josephquiz-postgres:

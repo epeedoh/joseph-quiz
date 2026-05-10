@@ -1,0 +1,87 @@
+<div class="min-h-screen bg-parchment text-ink">
+  <div class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-ink/85 backdrop-blur-xl">
+    <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+      <a routerLink="/" class="flex min-w-0 items-center gap-3 text-white">
+        <div class="rounded-[22px] bg-white/95 px-2 py-1 shadow-sm ring-1 ring-gold/30">
+          <img
+            src="assets/brand/vh-logo.png"
+            alt="Vases d'Honneur"
+            class="h-11 w-[82px] object-contain sm:h-12 sm:w-[92px]"
+          />
+        </div>
+
+        <div class="min-w-0">
+          <p class="truncate font-display text-lg tracking-[0.24em] text-gold">JOSEPH QUIZ</p>
+          <p class="truncate text-xs uppercase tracking-[0.28em] text-white/60">Vases d'Honneur</p>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-3">
+        <nav class="hidden items-center gap-2 md:flex">
+          <a
+            routerLink="/"
+            routerLinkActive="bg-white/10 text-white"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="rounded-full px-4 py-2 text-sm font-semibold text-white/70 transition hover:bg-white/10 hover:text-white"
+          >
+            Tableau de bord
+          </a>
+          <a
+            routerLink="/quiz"
+            routerLinkActive="bg-white/10 text-white"
+            class="rounded-full px-4 py-2 text-sm font-semibold text-white/70 transition hover:bg-white/10 hover:text-white"
+          >
+            Quiz
+          </a>
+          <a
+            routerLink="/leaderboard"
+            routerLinkActive="bg-white/10 text-white"
+            class="rounded-full px-4 py-2 text-sm font-semibold text-white/70 transition hover:bg-white/10 hover:text-white"
+          >
+            Classements
+          </a>
+          <a
+            routerLink="/team"
+            routerLinkActive="bg-white/10 text-white"
+            class="rounded-full px-4 py-2 text-sm font-semibold text-white/70 transition hover:bg-white/10 hover:text-white"
+          >
+            Equipe
+          </a>
+          <a
+            routerLink="/profile"
+            routerLinkActive="bg-white/10 text-white"
+            class="rounded-full px-4 py-2 text-sm font-semibold text-white/70 transition hover:bg-white/10 hover:text-white"
+          >
+            Profil
+          </a>
+        </nav>
+
+        <a
+          routerLink="/"
+          class="rounded-[22px] bg-white/95 px-2 py-1 shadow-sm ring-1 ring-gold/30 transition hover:-translate-y-0.5"
+          aria-label="Distinction Divine"
+        >
+          <img
+            src="assets/brand/dd-logo-bleu.png"
+            alt="Distinction Divine"
+            class="h-10 w-[72px] object-contain sm:h-12 sm:w-[88px]"
+          />
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <main class="mx-auto max-w-6xl px-4 pb-24 pt-24 sm:px-6 lg:px-8">
+    <router-outlet />
+  </main>
+
+  <div class="fixed inset-x-0 bottom-0 z-40 border-t border-ink/10 bg-white/85 backdrop-blur-xl md:hidden">
+    <div class="mx-auto grid max-w-2xl grid-cols-5 gap-1 px-2 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/70">
+      <a routerLink="/" routerLinkActive="bg-royal text-white" [routerLinkActiveOptions]="{ exact: true }" class="rounded-2xl px-2 py-3 text-center transition">Accueil</a>
+      <a routerLink="/quiz" routerLinkActive="bg-royal text-white" class="rounded-2xl px-2 py-3 text-center transition">Quiz</a>
+      <a routerLink="/leaderboard" routerLinkActive="bg-royal text-white" class="rounded-2xl px-2 py-3 text-center transition">Top</a>
+      <a routerLink="/team" routerLinkActive="bg-royal text-white" class="rounded-2xl px-2 py-3 text-center transition">Equipe</a>
+      <a routerLink="/profile" routerLinkActive="bg-royal text-white" class="rounded-2xl px-2 py-3 text-center transition">Profil</a>
+    </div>
+  </div>
+</div>
