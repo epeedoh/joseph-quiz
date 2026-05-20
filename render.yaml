@@ -13,6 +13,13 @@ services:
       - key: ConnectionStrings__DefaultConnection
         sync: false
       - key: Cors__AllowedOrigins__0
-        value: https://joseph-quiz.vercel.app
+        value: https://joseph-quiz-web.onrender.com
       - key: Cors__AllowedOrigins__1
         value: http://localhost:4200
+  - type: web
+    name: joseph-quiz-web
+    env: docker
+    rootDir: ./web/joseph-quiz-web
+    dockerfilePath: ./Dockerfile
+    autoDeploy: true
+    plan: free
