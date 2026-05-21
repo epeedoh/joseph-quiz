@@ -153,49 +153,94 @@ import { ChapterSelectorComponent } from '../chapter-selector/chapter-selector.c
           <div>
             <p class="gold-chip">Organisation equipe</p>
             <h2 class="mt-4 section-title">Repartition des chapitres</h2>
-            <p class="mt-2 text-sm text-ink/65">Chaque participant revise un bloc precis pour accelerer la preparation collective.</p>
+            <p class="mt-2 text-sm text-ink/65">Choisis ton nom ou le chapitre que tu veux prendre en charge, puis applique-le directement a ton entrainement.</p>
           </div>
 
-          @if (currentAssignment(); as assignment) {
+          @if (selectedAssignment(); as assignment) {
             <button
               type="button"
               (click)="focusAssignment(assignment)"
               class="rounded-full bg-royal px-5 py-3 text-sm font-extrabold uppercase tracking-[0.18em] text-white transition hover:bg-ink"
             >
-              Ouvrir mon chapitre
+              Appliquer au quiz
             </button>
           }
         </div>
 
-        @if (currentAssignment(); as assignment) {
-          <div class="mt-6 rounded-[28px] border border-gold/20 bg-gradient-to-r from-gold/10 to-white p-5">
-            <p class="text-xs font-bold uppercase tracking-[0.18em] text-gold">Attribution active</p>
+        <div class="mt-6 grid gap-4 lg:grid-cols-[0.45fr_0.55fr]">
+          <div class="rounded-[28px] border border-ink/10 bg-white/70 p-5">
+            <p class="text-xs font-bold uppercase tracking-[0.18em] text-gold">Selection rapide</p>
+            <label class="mt-4 block space-y-2 text-sm font-semibold text-ink/70">
+              Participant
+              <select
+                class="w-full rounded-2xl border-0 bg-ink/5"
+                [ngModel]="selectedAssignmentKey()"
+                (ngModelChange)="selectAssignmentByKey($event)">
+                <option value="">Choisir un participant</option>
+                @for (assignment of chapterAssignments; track assignment.member) {
+                  <option [value]="assignmentKey(assignment)">{{ assignment.member }} - {{ assignment.chapters }}</option>
+                }
+              </select>
+            </label>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+              @for (chapter of chapterOptions; track chapter) {
+                <button
+                  type="button"
+                  (click)="selectAssignmentByChapter(chapter)"
+                  class="rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] transition"
+                  [ngClass]="isSelectedChapter(chapter) ? 'bg-royal text-white' : 'bg-ink/5 text-ink/70 hover:bg-ink/10'">
+                  {{ chapter }}
+                </button>
+              }
+            </div>
+          </div>
+
+          @if (selectedAssignment(); as assignment) {
+          <div class="rounded-[28px] border border-gold/20 bg-gradient-to-r from-gold/10 to-white p-5">
+            <p class="text-xs font-bold uppercase tracking-[0.18em] text-gold">Mission active</p>
             <h3 class="mt-2 font-display text-2xl text-royal">{{ assignment.member }}</h3>
             <p class="mt-2 text-base font-semibold text-ink">{{ assignment.chapters }}</p>
             @if (assignment.note) {
               <p class="mt-2 text-sm text-ink/65">{{ assignment.note }}</p>
             }
+            <div class="mt-5 flex flex-wrap gap-3">
+              <button
+                type="button"
+                (click)="focusAssignment(assignment)"
+                class="rounded-full bg-royal px-5 py-3 text-sm font-extrabold uppercase tracking-[0.18em] text-white transition hover:bg-ink">
+                Charger cette mission
+              </button>
+              <span class="rounded-full bg-white px-4 py-3 text-xs font-bold uppercase tracking-[0.18em] text-ink/60">
+                {{ assignment.chapterStart === assignment.chapterEnd ? 'Chapitre unique' : 'Plage de chapitres' }}
+              </span>
+            </div>
           </div>
-        }
+          } @else {
+          <div class="rounded-[28px] border border-dashed border-ink/15 bg-white/60 p-5">
+            <p class="text-sm text-ink/65">Selectionne un participant ou un chapitre pour activer une mission de revision.</p>
+          </div>
+          }
+        </div>
 
         <div class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           @for (assignment of chapterAssignments; track assignment.member) {
             <button
               type="button"
-              (click)="focusAssignment(assignment)"
+              (click)="selectAssignment(assignment)"
               class="rounded-[26px] border p-5 text-left transition"
-              [ngClass]="isCurrentAssignment(assignment) ? 'border-royal bg-royal text-white shadow-card' : 'border-ink/10 bg-white/70 hover:border-royal/20 hover:bg-white'"
+              [ngClass]="isSelectedAssignment(assignment) ? 'border-royal bg-royal text-white shadow-card' : 'border-ink/10 bg-white/70 hover:border-royal/20 hover:bg-white'"
             >
               <p
                 class="text-xs font-bold uppercase tracking-[0.18em]"
-                [ngClass]="isCurrentAssignment(assignment) ? 'text-white/75' : 'text-gold'">
+                [ngClass]="isSelectedAssignment(assignment) ? 'text-white/75' : 'text-gold'">
                 {{ assignment.chapters }}
               </p>
-              <h3 class="mt-3 font-display text-xl" [ngClass]="isCurrentAssignment(assignment) ? 'text-white' : 'text-royal'">
+              <h3 class="mt-3 font-display text-xl" [ngClass]="isSelectedAssignment(assignment) ? 'text-white' : 'text-royal'">
                 {{ assignment.member }}
               </h3>
               @if (assignment.note) {
-                <p class="mt-2 text-sm" [ngClass]="isCurrentAssignment(assignment) ? 'text-white/80' : 'text-ink/65'">{{ assignment.note }}</p>
+                <p class="mt-2 text-sm" [ngClass]="isSelectedAssignment(assignment) ? 'text-white/80' : 'text-ink/65'">{{ assignment.note }}</p>
               }
             </button>
           }
@@ -261,6 +306,7 @@ export class DashboardComponent {
 
   readonly zones = ZONE_CATALOG;
   readonly chapterAssignments = CHAPTER_ASSIGNMENTS;
+  readonly chapterOptions = [37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50];
   readonly selection = signal<QuizSelection>({
     pseudo: this.progressService.pseudo() || '',
     zone: 1,
@@ -275,6 +321,7 @@ export class DashboardComponent {
   });
 
   pseudo = this.progressService.pseudo();
+  readonly selectedAssignment = signal<ChapterAssignment | null>(null);
   readonly saveState = signal<'idle' | 'success' | 'error'>('idle');
   readonly saveMessage = signal('');
   readonly defaultRecommendations = [
@@ -294,6 +341,12 @@ export class DashboardComponent {
       if (pseudo) {
         this.pseudo = pseudo;
         this.selection.update((selection) => ({ ...selection, pseudo }));
+        if (!this.selectedAssignment()) {
+          const matchedAssignment = this.chapterAssignments.find((assignment) => assignment.member.toLowerCase().includes(pseudo.toLowerCase()));
+          if (matchedAssignment) {
+            this.selectedAssignment.set(matchedAssignment);
+          }
+        }
       } else {
         this.pseudo = '';
         this.selection.update((selection) => ({ ...selection, pseudo: '' }));
@@ -301,17 +354,40 @@ export class DashboardComponent {
     });
   }
 
-  currentAssignment(): ChapterAssignment | null {
-    const pseudo = this.pseudo.trim().toLowerCase();
-    if (!pseudo) {
-      return null;
-    }
-
-    return this.chapterAssignments.find((assignment) => assignment.member.toLowerCase().includes(pseudo)) ?? null;
+  assignmentKey(assignment: ChapterAssignment): string {
+    return `${assignment.member}|${assignment.chapterStart}|${assignment.chapterEnd}`;
   }
 
-  isCurrentAssignment(assignment: ChapterAssignment): boolean {
-    return this.currentAssignment()?.member === assignment.member;
+  selectedAssignmentKey(): string {
+    const assignment = this.selectedAssignment();
+    return assignment ? this.assignmentKey(assignment) : '';
+  }
+
+  selectAssignment(assignment: ChapterAssignment): void {
+    this.selectedAssignment.set(assignment);
+  }
+
+  selectAssignmentByKey(key: string): void {
+    const assignment = this.chapterAssignments.find((item) => this.assignmentKey(item) === key) ?? null;
+    this.selectedAssignment.set(assignment);
+  }
+
+  selectAssignmentByChapter(chapter: number): void {
+    const assignment = this.chapterAssignments.find((item) => item.chapterStart <= chapter && item.chapterEnd >= chapter) ?? null;
+    this.selectedAssignment.set(assignment);
+  }
+
+  isSelectedAssignment(assignment: ChapterAssignment): boolean {
+    return this.selectedAssignment()?.member === assignment.member;
+  }
+
+  isSelectedChapter(chapter: number): boolean {
+    const assignment = this.selectedAssignment();
+    if (!assignment) {
+      return false;
+    }
+
+    return assignment.chapterStart <= chapter && assignment.chapterEnd >= chapter;
   }
 
   async savePseudo(): Promise<boolean> {
@@ -350,6 +426,7 @@ export class DashboardComponent {
   }
 
   focusAssignment(assignment: ChapterAssignment): void {
+    this.selectedAssignment.set(assignment);
     this.selection.update((selection) => ({
       ...selection,
       zone: null,
