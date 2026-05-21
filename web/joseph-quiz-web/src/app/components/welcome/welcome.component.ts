@@ -82,12 +82,6 @@ export class WelcomeComponent {
   pseudo = this.progressService.pseudo();
   message = '';
 
-  constructor() {
-    if (this.progressService.pseudo()) {
-      void this.router.navigateByUrl('/dashboard');
-    }
-  }
-
   async continue(): Promise<void> {
     const normalizedPseudo = this.pseudo.trim();
     if (!normalizedPseudo) {
