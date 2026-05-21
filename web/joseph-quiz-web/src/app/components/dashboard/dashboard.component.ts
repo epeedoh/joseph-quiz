@@ -147,6 +147,37 @@ import { ChapterSelectorComponent } from '../chapter-selector/chapter-selector.c
       <app-chapter-selector [selection]="selection()" (selectionChange)="selection.set($event)" />
     </section>
 
+    <section class="mt-5">
+      <article class="rounded-[30px] border border-gold/25 bg-gradient-to-r from-gold/10 via-white to-white p-5 shadow-[0_20px_50px_rgba(198,157,38,0.08)]">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div class="max-w-2xl">
+            <p class="text-xs font-bold uppercase tracking-[0.22em] text-gold">Etape suivante</p>
+            <h2 class="mt-2 font-display text-2xl text-royal">Ta selection est prete: lance maintenant le quiz</h2>
+            <p class="mt-2 text-sm text-ink/65">
+              Apres avoir choisi la zone, le chapitre ou la plage, il faut cliquer sur l'un des boutons ci-dessous pour demarrer la session.
+            </p>
+          </div>
+
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              (click)="launch('revision')"
+              class="rounded-full bg-royal px-5 py-3 text-sm font-extrabold uppercase tracking-[0.18em] text-white transition hover:bg-ink"
+            >
+              Lancer une revision
+            </button>
+            <button
+              type="button"
+              (click)="launch('competition')"
+              class="rounded-full border border-royal/20 bg-white px-5 py-3 text-sm font-extrabold uppercase tracking-[0.18em] text-royal transition hover:bg-royal hover:text-white"
+            >
+              Mode competition
+            </button>
+          </div>
+        </div>
+      </article>
+    </section>
+
     <section class="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
       <article class="glass-card p-6">
         <div class="flex items-center justify-between gap-4">
