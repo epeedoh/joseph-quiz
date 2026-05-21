@@ -336,6 +336,10 @@ export class DashboardComponent {
   ];
 
   constructor() {
+    if (!this.progressService.pseudo()) {
+      void this.router.navigateByUrl('/');
+    }
+
     effect(() => {
       const pseudo = this.progressService.pseudo();
       if (pseudo) {

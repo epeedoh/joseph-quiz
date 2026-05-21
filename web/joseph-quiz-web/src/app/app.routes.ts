@@ -4,6 +4,11 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () =>
+      import('./components/welcome/welcome.component').then((module) => module.WelcomeComponent)
+  },
+  {
+    path: 'dashboard',
+    loadComponent: () =>
       import('./components/dashboard/dashboard.component').then((module) => module.DashboardComponent)
   },
   {
