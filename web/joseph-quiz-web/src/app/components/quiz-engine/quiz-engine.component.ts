@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
 import { ProgressService } from '../../services/progress.service';
@@ -166,7 +166,11 @@ import { TimerComponent } from '../timer/timer.component';
             <div class="mt-4 grid gap-3">
               <div class="rounded-[24px] bg-ink/5 p-4">
                 <p class="text-xs uppercase tracking-[0.18em] text-ink/45">Réponses</p>
-                <p class="mt-2 text-2xl font-extrabold text-ink">{{ answeredCount() }}/{{ quizService.questions().length }}</p>
+                <p class="mt-2 text-2xl font-extrabold text-ink">{{ quizService.answeredCount() }}/{{ quizService.questions().length }}</p>
+              </div>
+              <div class="rounded-[24px] bg-ink/5 p-4">
+                <p class="text-xs uppercase tracking-[0.18em] text-ink/45">Score live</p>
+                <p class="mt-2 text-2xl font-extrabold text-royal">{{ quizService.liveScore() }}</p>
               </div>
               <div class="rounded-[24px] bg-ink/5 p-4">
                 <p class="text-xs uppercase tracking-[0.18em] text-ink/45">Niveau actuel</p>
@@ -189,20 +193,15 @@ export class QuizEngineComponent {
   private readonly router = inject(Router);
 
   readonly remainingMs = signal(15_000);
-  readonly answeredCount = signal(0);
   private questionStartedAt = performance.now();
   private pendingAdvance?: number;
 
   constructor() {
-    effect(() => {
-      const currentQuestion = this.quizService.currentQuestion();
-      if (currentQuestion) {
-        this.questionStartedAt = performance.now();
-        this.remainingMs.set((this.quizService.selection()?.timerSeconds ?? 15) * 1_000);
-      }
-
-      this.answeredCount.set(Object.keys(this.quizService.answers()).length);
-    });
+    const currentQuestion = this.quizService.currentQuestion();
+    if (currentQuestion) {
+      this.questionStartedAt = performance.now();
+      this.remainingMs.set((this.quizService.selection()?.timerSeconds ?? 15) * 1_000);
+    }
   }
 
   selectOption(optionKey: string): void {
@@ -227,6 +226,8 @@ export class QuizEngineComponent {
   nextQuestion(): void {
     window.clearTimeout(this.pendingAdvance);
     this.quizService.nextQuestion();
+    this.questionStartedAt = performance.now();
+    this.remainingMs.set((this.quizService.selection()?.timerSeconds ?? 15) * 1_000);
   }
 
   async resetAndGoHome(): Promise<void> {

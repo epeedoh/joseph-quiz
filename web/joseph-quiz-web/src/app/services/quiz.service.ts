@@ -31,6 +31,52 @@ export class QuizService {
   readonly result = signal<QuizResult | null>(null);
 
   readonly currentQuestion = computed(() => this.questions()[this.currentIndex()] ?? null);
+  readonly answeredCount = computed(() => Object.keys(this.answers()).length);
+  readonly correctCount = computed(() => {
+    const questions = this.questions();
+    const answers = this.answers();
+
+    return questions.reduce((count, question) => {
+      const answer = answers[question.id];
+      return count + (answer?.selectedOption === question.correctOption ? 1 : 0);
+    }, 0);
+  });
+  readonly liveScore = computed(() => {
+    const selection = this.selection();
+    const questions = this.questions();
+    const answers = this.answers();
+
+    if (!selection || !questions.length) {
+      return 0;
+    }
+
+    let correctAnswers = 0;
+    let fastAnswers = 0;
+    let maxCombo = 0;
+    let currentCombo = 0;
+
+    for (const question of questions) {
+      const answer = answers[question.id];
+      if (!answer) {
+        continue;
+      }
+
+      const isCorrect = answer.selectedOption === question.correctOption;
+      if (isCorrect) {
+        correctAnswers += 1;
+        currentCombo += 1;
+        maxCombo = Math.max(maxCombo, currentCombo);
+
+        if (answer.responseTimeMs <= Math.min(7_000, (selection.timerSeconds * 1_000) / 2)) {
+          fastAnswers += 1;
+        }
+      } else {
+        currentCombo = 0;
+      }
+    }
+
+    return (correctAnswers * 100) + (fastAnswers * 25) + (maxCombo >= 2 ? maxCombo * 10 : 0);
+  });
   readonly progressPercent = computed(() => {
     const total = this.questions().length;
     if (!total) {
