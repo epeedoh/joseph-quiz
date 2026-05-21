@@ -167,60 +167,52 @@ import { ChapterSelectorComponent } from '../chapter-selector/chapter-selector.c
           }
         </div>
 
-        <div class="mt-6 grid gap-4 lg:grid-cols-[0.45fr_0.55fr]">
-          <div class="rounded-[28px] border border-ink/10 bg-white/70 p-5">
-            <p class="text-xs font-bold uppercase tracking-[0.18em] text-gold">Selection rapide</p>
-            <label class="mt-4 block space-y-2 text-sm font-semibold text-ink/70">
-              Participant
-              <select
-                class="w-full rounded-2xl border-0 bg-ink/5"
-                [ngModel]="selectedAssignmentKey()"
-                (ngModelChange)="selectAssignmentByKey($event)">
-                <option value="">Choisir un participant</option>
-                @for (assignment of chapterAssignments; track assignment.member) {
-                  <option [value]="assignmentKey(assignment)">{{ assignment.member }} - {{ assignment.chapters }}</option>
+        <div class="mt-6 rounded-[28px] border border-ink/10 bg-white/70 p-5">
+          <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div class="w-full max-w-xl">
+              <p class="text-xs font-bold uppercase tracking-[0.18em] text-gold">Selection rapide</p>
+              <label class="mt-4 block space-y-2 text-sm font-semibold text-ink/70">
+                Participant
+                <select
+                  class="w-full rounded-2xl border-0 bg-ink/5"
+                  [ngModel]="selectedAssignmentKey()"
+                  (ngModelChange)="selectAssignmentByKey($event)">
+                  <option value="">Choisir un participant</option>
+                  @for (assignment of chapterAssignments; track assignment.member) {
+                    <option [value]="assignmentKey(assignment)">{{ assignment.member }} - {{ assignment.chapters }}</option>
+                  }
+                </select>
+              </label>
+
+              <div class="mt-4 flex flex-wrap gap-2">
+                @for (chapter of chapterOptions; track chapter) {
+                  <button
+                    type="button"
+                    (click)="selectAssignmentByChapter(chapter)"
+                    class="rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] transition"
+                    [ngClass]="isSelectedChapter(chapter) ? 'bg-royal text-white' : 'bg-ink/5 text-ink/70 hover:bg-ink/10'">
+                    {{ chapter }}
+                  </button>
                 }
-              </select>
-            </label>
-
-            <div class="mt-4 flex flex-wrap gap-2">
-              @for (chapter of chapterOptions; track chapter) {
-                <button
-                  type="button"
-                  (click)="selectAssignmentByChapter(chapter)"
-                  class="rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] transition"
-                  [ngClass]="isSelectedChapter(chapter) ? 'bg-royal text-white' : 'bg-ink/5 text-ink/70 hover:bg-ink/10'">
-                  {{ chapter }}
-                </button>
-              }
+              </div>
             </div>
-          </div>
-
-          @if (selectedAssignment(); as assignment) {
-          <div class="rounded-[28px] border border-gold/20 bg-gradient-to-r from-gold/10 to-white p-5">
-            <p class="text-xs font-bold uppercase tracking-[0.18em] text-gold">Mission active</p>
-            <h3 class="mt-2 font-display text-2xl text-royal">{{ assignment.member }}</h3>
-            <p class="mt-2 text-base font-semibold text-ink">{{ assignment.chapters }}</p>
-            @if (assignment.note) {
-              <p class="mt-2 text-sm text-ink/65">{{ assignment.note }}</p>
-            }
-            <div class="mt-5 flex flex-wrap gap-3">
+            <div class="flex flex-wrap gap-3">
+              @if (selectedAssignment(); as assignment) {
+                <div class="rounded-[22px] border border-gold/20 bg-gradient-to-r from-gold/10 to-white px-4 py-3">
+                  <p class="text-xs font-bold uppercase tracking-[0.18em] text-gold">Mission active</p>
+                  <p class="mt-1 font-display text-xl text-royal">{{ assignment.member }}</p>
+                  <p class="text-sm font-semibold text-ink">{{ assignment.chapters }}</p>
+                </div>
+              }
               <button
                 type="button"
-                (click)="focusAssignment(assignment)"
+                [disabled]="!selectedAssignment()"
+                (click)="selectedAssignment() && focusAssignment(selectedAssignment()!)"
                 class="rounded-full bg-royal px-5 py-3 text-sm font-extrabold uppercase tracking-[0.18em] text-white transition hover:bg-ink">
                 Charger cette mission
               </button>
-              <span class="rounded-full bg-white px-4 py-3 text-xs font-bold uppercase tracking-[0.18em] text-ink/60">
-                {{ assignment.chapterStart === assignment.chapterEnd ? 'Chapitre unique' : 'Plage de chapitres' }}
-              </span>
             </div>
           </div>
-          } @else {
-          <div class="rounded-[28px] border border-dashed border-ink/15 bg-white/60 p-5">
-            <p class="text-sm text-ink/65">Selectionne un participant ou un chapitre pour activer une mission de revision.</p>
-          </div>
-          }
         </div>
 
         <div class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
