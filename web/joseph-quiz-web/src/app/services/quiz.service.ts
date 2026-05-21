@@ -97,8 +97,38 @@ export class QuizService {
       return null;
     }
 
+    const answeredQuestions = this.questions()
+      .slice(0, this.currentIndex() + 1)
+      .map((item) => ({
+        question: item,
+        answer: this.answers()[item.id]
+      }))
+      .filter((item) => !!item.answer);
+
+    let comboBeforeCurrent = 0;
+    for (let index = 0; index < answeredQuestions.length - 1; index += 1) {
+      const item = answeredQuestions[index];
+      if (item.answer!.selectedOption === item.question.correctOption) {
+        comboBeforeCurrent += 1;
+      } else {
+        comboBeforeCurrent = 0;
+      }
+    }
+
+    const isCorrect = answer.selectedOption === question.correctOption;
+    const fastThreshold = Math.min(7_000, ((this.selection()?.timerSeconds ?? 15) * 1_000) / 2);
+    const isFast = isCorrect && answer.responseTimeMs <= fastThreshold;
+    const comboAfterAnswer = isCorrect ? comboBeforeCurrent + 1 : 0;
+    const comboBonus = comboAfterAnswer >= 2 ? comboAfterAnswer * 10 : 0;
+    const scoreEarned = isCorrect ? 100 + (isFast ? 25 : 0) + comboBonus : 0;
+    const xpEarned = isCorrect ? 10 + (isFast ? 5 : 0) + (comboAfterAnswer >= 3 ? comboAfterAnswer * 3 : 0) : 0;
+
     return {
-      isCorrect: answer.selectedOption === question.correctOption,
+      isCorrect,
+      isFast,
+      comboAfterAnswer,
+      scoreEarned,
+      xpEarned,
       correctOption: question.correctOption,
       verseReference: question.verseReference,
       verseText: question.verseText,

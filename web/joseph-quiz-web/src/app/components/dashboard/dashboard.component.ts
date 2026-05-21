@@ -3,7 +3,7 @@ import { Component, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
-import { QuizMode, QuizSelection, ZONE_CATALOG } from '../../core/models/quiz.models';
+import { CHAPTER_ASSIGNMENTS, ChapterAssignment, QuizMode, QuizSelection, ZONE_CATALOG } from '../../core/models/quiz.models';
 import { ProgressService } from '../../services/progress.service';
 import { QuizService } from '../../services/quiz.service';
 import { ChapterSelectorComponent } from '../chapter-selector/chapter-selector.component';
@@ -147,6 +147,62 @@ import { ChapterSelectorComponent } from '../chapter-selector/chapter-selector.c
       <app-chapter-selector [selection]="selection()" (selectionChange)="selection.set($event)" />
     </section>
 
+    <section class="mt-6">
+      <article class="glass-card p-6">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p class="gold-chip">Organisation equipe</p>
+            <h2 class="mt-4 section-title">Repartition des chapitres</h2>
+            <p class="mt-2 text-sm text-ink/65">Chaque participant revise un bloc precis pour accelerer la preparation collective.</p>
+          </div>
+
+          @if (currentAssignment(); as assignment) {
+            <button
+              type="button"
+              (click)="focusAssignment(assignment)"
+              class="rounded-full bg-royal px-5 py-3 text-sm font-extrabold uppercase tracking-[0.18em] text-white transition hover:bg-ink"
+            >
+              Ouvrir mon chapitre
+            </button>
+          }
+        </div>
+
+        @if (currentAssignment(); as assignment) {
+          <div class="mt-6 rounded-[28px] border border-gold/20 bg-gradient-to-r from-gold/10 to-white p-5">
+            <p class="text-xs font-bold uppercase tracking-[0.18em] text-gold">Attribution active</p>
+            <h3 class="mt-2 font-display text-2xl text-royal">{{ assignment.member }}</h3>
+            <p class="mt-2 text-base font-semibold text-ink">{{ assignment.chapters }}</p>
+            @if (assignment.note) {
+              <p class="mt-2 text-sm text-ink/65">{{ assignment.note }}</p>
+            }
+          </div>
+        }
+
+        <div class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          @for (assignment of chapterAssignments; track assignment.member) {
+            <button
+              type="button"
+              (click)="focusAssignment(assignment)"
+              class="rounded-[26px] border p-5 text-left transition"
+              [ngClass]="isCurrentAssignment(assignment) ? 'border-royal bg-royal text-white shadow-card' : 'border-ink/10 bg-white/70 hover:border-royal/20 hover:bg-white'"
+            >
+              <p
+                class="text-xs font-bold uppercase tracking-[0.18em]"
+                [ngClass]="isCurrentAssignment(assignment) ? 'text-white/75' : 'text-gold'">
+                {{ assignment.chapters }}
+              </p>
+              <h3 class="mt-3 font-display text-xl" [ngClass]="isCurrentAssignment(assignment) ? 'text-white' : 'text-royal'">
+                {{ assignment.member }}
+              </h3>
+              @if (assignment.note) {
+                <p class="mt-2 text-sm" [ngClass]="isCurrentAssignment(assignment) ? 'text-white/80' : 'text-ink/65'">{{ assignment.note }}</p>
+              }
+            </button>
+          }
+        </div>
+      </article>
+    </section>
+
     <section class="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
       <article class="glass-card p-6">
         <div class="flex items-center justify-between gap-4">
@@ -204,6 +260,7 @@ export class DashboardComponent {
   private readonly router = inject(Router);
 
   readonly zones = ZONE_CATALOG;
+  readonly chapterAssignments = CHAPTER_ASSIGNMENTS;
   readonly selection = signal<QuizSelection>({
     pseudo: this.progressService.pseudo() || '',
     zone: 1,
@@ -244,6 +301,19 @@ export class DashboardComponent {
     });
   }
 
+  currentAssignment(): ChapterAssignment | null {
+    const pseudo = this.pseudo.trim().toLowerCase();
+    if (!pseudo) {
+      return null;
+    }
+
+    return this.chapterAssignments.find((assignment) => assignment.member.toLowerCase().includes(pseudo)) ?? null;
+  }
+
+  isCurrentAssignment(assignment: ChapterAssignment): boolean {
+    return this.currentAssignment()?.member === assignment.member;
+  }
+
   async savePseudo(): Promise<boolean> {
     return this.persistPseudo(true);
   }
@@ -277,6 +347,16 @@ export class DashboardComponent {
     this.selection.set(baseSelection);
     await this.quizService.start(baseSelection);
     await this.router.navigateByUrl('/quiz');
+  }
+
+  focusAssignment(assignment: ChapterAssignment): void {
+    this.selection.update((selection) => ({
+      ...selection,
+      zone: null,
+      chapter: assignment.chapterStart === assignment.chapterEnd ? assignment.chapterStart : null,
+      chapterStart: assignment.chapterStart === assignment.chapterEnd ? null : assignment.chapterStart,
+      chapterEnd: assignment.chapterStart === assignment.chapterEnd ? null : assignment.chapterEnd
+    }));
   }
 
   private async persistPseudo(showFeedback: boolean): Promise<boolean> {

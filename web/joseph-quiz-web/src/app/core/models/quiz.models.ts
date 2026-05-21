@@ -120,11 +120,38 @@ export interface PendingSyncItem {
   createdAt: string;
 }
 
+export interface ChapterAssignment {
+  member: string;
+  chapters: string;
+  chapterStart: number;
+  chapterEnd: number;
+  note?: string;
+}
+
 export const ZONE_CATALOG = [
-  { id: 1, title: 'Zone 1', subtitle: 'Les rêves et la trahison', chapters: 'Genèse 37-38', icon: '🌙' },
-  { id: 2, title: 'Zone 2', subtitle: 'Prison et élévation', chapters: 'Genèse 39-41', icon: '⛓️' },
-  { id: 3, title: 'Zone 3', subtitle: 'Tests et réconciliation', chapters: 'Genèse 42-45', icon: '🍷' },
-  { id: 4, title: 'Zone 4', subtitle: 'Héritage et fin de vie', chapters: 'Genèse 46-50', icon: '👑' }
+  { id: 1, title: 'Zone 1', subtitle: 'Les reves et la trahison', chapters: 'Genese 37-38', icon: '🌙' },
+  { id: 2, title: 'Zone 2', subtitle: 'Prison et elevation', chapters: 'Genese 39-41', icon: '⛓️' },
+  { id: 3, title: 'Zone 3', subtitle: 'Tests et reconciliation', chapters: 'Genese 42-45', icon: '🍷' },
+  { id: 4, title: 'Zone 4', subtitle: 'Heritage et fin de vie', chapters: 'Genese 46-50', icon: '👑' }
 ] as const;
 
-export const TEAM_SUGGESTIONS = ['Les Rêveurs', 'Les Intendants', 'Les Gouverneurs', 'Les Héritiers'];
+export const TEAM_SUGGESTIONS = ['Les Reveurs', 'Les Intendants', 'Les Gouverneurs', 'Les Heritiers'];
+
+export const CHAPTER_ASSIGNMENTS: ChapterAssignment[] = [
+  { member: 'VN3 / Yx5', chapters: 'Chapitre 37', chapterStart: 37, chapterEnd: 37 },
+  { member: 'VH Danilo', chapters: 'Chapitre 38', chapterStart: 38, chapterEnd: 38 },
+  { member: 'Marie Aude 22', chapters: 'Chapitre 39', chapterStart: 39, chapterEnd: 39 },
+  { member: 'Epe', chapters: 'Chapitre 40', chapterStart: 40, chapterEnd: 40, note: 'Ton chapitre attribue' },
+  { member: 'Sarah Koffi', chapters: 'Chapitre 41', chapterStart: 41, chapterEnd: 41 },
+  { member: 'Dora', chapters: 'Chapitre 42', chapterStart: 42, chapterEnd: 42 },
+  { member: 'Isaiah', chapters: 'Chapitre 43', chapterStart: 43, chapterEnd: 43 },
+  { member: 'Mains jointes', chapters: 'Chapitre 44', chapterStart: 44, chapterEnd: 44 },
+  { member: 'Emma M', chapters: 'Chapitre 45', chapterStart: 45, chapterEnd: 45 },
+  { member: '+225 0716650511', chapters: 'Chapitre 46', chapterStart: 46, chapterEnd: 46 },
+  { member: 'Kouao Edwige', chapters: 'Chapitre 47', chapterStart: 47, chapterEnd: 47 },
+  { member: '+225 0705452554', chapters: 'Chapitre 48', chapterStart: 48, chapterEnd: 48 },
+  { member: 'Millogo Gloria', chapters: 'Chapitres 49 a 50', chapterStart: 49, chapterEnd: 50 },
+  { member: 'Luxi', chapters: 'Chapitres 37 a 50', chapterStart: 37, chapterEnd: 50, note: 'Couverture complete' },
+  { member: 'Laeticia Heimon', chapters: 'Chapitres 37 a 50', chapterStart: 37, chapterEnd: 50, note: 'Couverture complete' },
+  { member: 'Daniel Heimon', chapters: 'Chapitres 37 a 50', chapterStart: 37, chapterEnd: 50, note: 'Couverture complete' }
+];
