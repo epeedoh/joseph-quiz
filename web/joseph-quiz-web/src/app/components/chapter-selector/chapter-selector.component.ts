@@ -24,7 +24,7 @@ import { QuizSelection, ZONE_CATALOG } from '../../core/models/quiz.models';
         @for (zone of zones; track zone.id) {
           <button
             type="button"
-            (click)="update({ zone: zone.id, chapter: null, chapterStart: null, chapterEnd: null })"
+            (click)="update({ zone: zone.id, chapter: null, chapterStart: null, chapterEnd: null }, true)"
             class="rounded-[24px] border p-4 text-left transition"
             [ngClass]="selection.zone === zone.id ? 'border-royal bg-royal text-white' : 'border-ink/10 bg-white/70'">
             <p class="text-2xl">{{ zone.icon }}</p>
@@ -73,7 +73,7 @@ import { QuizSelection, ZONE_CATALOG } from '../../core/models/quiz.models';
               max="50"
               class="mt-3 w-full rounded-2xl border-0 bg-ink/5"
               [ngModel]="selection.chapter"
-              (ngModelChange)="update({ chapter: $event ? +$event : null, zone: null, chapterStart: null, chapterEnd: null })" />
+              (ngModelChange)="update({ chapter: $event ? +$event : null, zone: null, chapterStart: null, chapterEnd: null }, true)" />
           </label>
 
           <label class="rounded-[24px] bg-white/80 p-4 shadow-sm ring-1 ring-ink/5">
@@ -85,7 +85,7 @@ import { QuizSelection, ZONE_CATALOG } from '../../core/models/quiz.models';
               max="50"
               class="mt-3 w-full rounded-2xl border-0 bg-ink/5"
               [ngModel]="selection.chapterStart"
-              (ngModelChange)="update({ chapterStart: $event ? +$event : null, chapter: null, zone: null })" />
+              (ngModelChange)="update({ chapterStart: $event ? +$event : null, chapter: null, zone: null }, true)" />
           </label>
 
           <label class="rounded-[24px] bg-white/80 p-4 shadow-sm ring-1 ring-ink/5">
@@ -97,7 +97,7 @@ import { QuizSelection, ZONE_CATALOG } from '../../core/models/quiz.models';
               max="50"
               class="mt-3 w-full rounded-2xl border-0 bg-ink/5"
               [ngModel]="selection.chapterEnd"
-              (ngModelChange)="update({ chapterEnd: $event ? +$event : null, chapter: null, zone: null })" />
+              (ngModelChange)="update({ chapterEnd: $event ? +$event : null, chapter: null, zone: null }, true)" />
           </label>
         </div>
       </div>
@@ -150,6 +150,7 @@ import { QuizSelection, ZONE_CATALOG } from '../../core/models/quiz.models';
 export class ChapterSelectorComponent {
   @Input({ required: true }) selection!: QuizSelection;
   @Output() readonly selectionChange = new EventEmitter<QuizSelection>();
+  @Output() readonly launchPromptRequested = new EventEmitter<void>();
 
   readonly zones = ZONE_CATALOG;
   readonly chapterOptions = [37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50];
@@ -172,18 +173,25 @@ export class ChapterSelectorComponent {
   }
 
   selectSingleChapter(chapter: number): void {
-    this.update({
-      chapter,
-      chapterStart: null,
-      chapterEnd: null,
-      zone: null
-    });
+    this.update(
+      {
+        chapter,
+        chapterStart: null,
+        chapterEnd: null,
+        zone: null
+      },
+      true
+    );
   }
 
-  update(partial: Partial<QuizSelection>): void {
+  update(partial: Partial<QuizSelection>, triggerLaunchPrompt = false): void {
     this.selectionChange.emit({
       ...this.selection,
       ...partial
     });
+
+    if (triggerLaunchPrompt) {
+      this.launchPromptRequested.emit();
+    }
   }
 }

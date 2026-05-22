@@ -155,10 +155,11 @@ export class QuizService {
         .post<Question[]>(`${environment.apiBaseUrl}/quiz/custom`, selection)
         .toPromise();
 
-      this.questions.set(questions ?? []);
+      this.questions.set(this.shuffleQuestions(questions ?? []));
       await this.offlineCache.write(cacheKey, this.questions());
     } catch {
-      this.questions.set((await this.offlineCache.read<Question[]>(cacheKey)) ?? []);
+      const cachedQuestions = (await this.offlineCache.read<Question[]>(cacheKey)) ?? [];
+      this.questions.set(this.shuffleQuestions(cachedQuestions));
     } finally {
       this.loading.set(false);
     }
@@ -389,5 +390,16 @@ export class QuizService {
       includeUnplayed: selection.includeUnplayed,
       limit: selection.limit
     })}`;
+  }
+
+  private shuffleQuestions(questions: Question[]): Question[] {
+    const items = [...questions];
+
+    for (let index = items.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(Math.random() * (index + 1));
+      [items[index], items[swapIndex]] = [items[swapIndex], items[index]];
+    }
+
+    return items;
   }
 }

@@ -144,7 +144,10 @@ import { ChapterSelectorComponent } from '../chapter-selector/chapter-selector.c
     </section>
 
     <section class="mt-6">
-      <app-chapter-selector [selection]="selection()" (selectionChange)="selection.set($event)" />
+      <app-chapter-selector
+        [selection]="selection()"
+        (selectionChange)="selection.set($event)"
+        (launchPromptRequested)="openLaunchHelp()" />
     </section>
 
     <section class="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
@@ -279,7 +282,7 @@ export class DashboardComponent {
   });
 
   pseudo = this.progressService.pseudo();
-  readonly launchHelpOpen = signal(true);
+  readonly launchHelpOpen = signal(false);
   readonly saveState = signal<'idle' | 'success' | 'error'>('idle');
   readonly saveMessage = signal('');
   readonly defaultRecommendations = [
