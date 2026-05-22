@@ -149,8 +149,7 @@ import { ChapterSelectorComponent } from '../chapter-selector/chapter-selector.c
     <section class="mt-6">
       <app-chapter-selector
         [selection]="selection()"
-        (selectionChange)="selection.set($event)"
-        (launchPromptRequested)="openLaunchHelp()" />
+        (selectionChange)="selection.set($event)" />
     </section>
 
     <section class="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
@@ -203,66 +202,6 @@ import { ChapterSelectorComponent } from '../chapter-selector/chapter-selector.c
       </article>
     </section>
 
-    @if (launchHelpOpen()) {
-      <div class="fixed inset-0 z-[70] bg-ink/45 backdrop-blur-sm" (click)="closeLaunchHelp()">
-        <div class="flex min-h-screen items-center justify-center p-4 sm:p-6">
-          <article
-            class="w-full max-w-3xl rounded-[34px] border border-gold/20 bg-white p-6 shadow-[0_28px_90px_rgba(15,23,42,0.18)] sm:p-8"
-            (click)="$event.stopPropagation()">
-            <div class="flex items-start justify-between gap-4">
-              <div class="max-w-2xl">
-                <p class="gold-chip">Etape suivante</p>
-                <h2 class="mt-4 font-display text-3xl text-royal sm:text-4xl">Ta selection est prete: lance maintenant le quiz</h2>
-                <p class="mt-3 text-sm text-ink/65 sm:text-base">
-                  Apres avoir choisi la zone, le chapitre ou la plage, clique sur l'un des boutons ci-dessous pour demarrer ta session.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                (click)="closeLaunchHelp()"
-                class="rounded-full border border-ink/10 px-4 py-2 text-sm font-bold uppercase tracking-[0.16em] text-ink/55 transition hover:border-royal/20 hover:text-royal">
-                Fermer
-              </button>
-            </div>
-
-            <div class="mt-6 grid gap-4 rounded-[28px] border border-gold/15 bg-gradient-to-r from-gold/10 via-white to-white p-5 lg:grid-cols-[1.2fr_0.8fr]">
-              <div>
-                <p class="text-xs font-bold uppercase tracking-[0.2em] text-gold">Selection active</p>
-                <p class="mt-3 font-display text-2xl text-royal">{{ currentSelectionSummary() }}</p>
-                <p class="mt-2 text-sm text-ink/65">
-                  Revision pour t'entrainer sereinement ou competition pour jouer avec chrono et pression.
-                </p>
-              </div>
-
-              <div class="flex flex-col gap-3">
-                <button
-                  type="button"
-                  (click)="launch('revision')"
-                  class="rounded-full bg-royal px-5 py-3 text-sm font-extrabold uppercase tracking-[0.18em] text-white transition hover:bg-ink"
-                >
-                  Lancer une revision
-                </button>
-                <button
-                  type="button"
-                  (click)="launch('competition')"
-                  class="rounded-full border border-royal/20 bg-white px-5 py-3 text-sm font-extrabold uppercase tracking-[0.18em] text-royal transition hover:bg-royal hover:text-white"
-                >
-                  Mode competition
-                </button>
-              </div>
-            </div>
-          </article>
-        </div>
-      </div>
-    }
-
-    <button
-      type="button"
-      (click)="openLaunchHelp()"
-      class="fixed bottom-20 right-4 z-[60] rounded-full bg-royal px-5 py-3 text-sm font-extrabold uppercase tracking-[0.18em] text-white shadow-card transition hover:-translate-y-0.5 hover:bg-ink md:bottom-6 md:right-6">
-      Lancer le quiz
-    </button>
   `
 })
 export class DashboardComponent implements OnInit {
@@ -285,7 +224,6 @@ export class DashboardComponent implements OnInit {
   });
 
   pseudo = this.progressService.pseudo();
-  readonly launchHelpOpen = signal(false);
   readonly saveState = signal<'idle' | 'success' | 'error'>('idle');
   readonly saveMessage = signal('');
   readonly defaultRecommendations = [
@@ -324,14 +262,6 @@ export class DashboardComponent implements OnInit {
     return this.persistPseudo(true);
   }
 
-  openLaunchHelp(): void {
-    this.launchHelpOpen.set(true);
-  }
-
-  closeLaunchHelp(): void {
-    this.launchHelpOpen.set(false);
-  }
-
   currentSelectionSummary(): string {
     const selection = this.selection();
 
@@ -360,7 +290,6 @@ export class DashboardComponent implements OnInit {
 
     const nextSelection = { ...this.selection(), pseudo: this.pseudo.trim(), mode };
     this.selection.set(nextSelection);
-    this.closeLaunchHelp();
     const started = await this.quizService.start(nextSelection);
     if (!started) {
       this.saveState.set('error');
