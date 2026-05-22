@@ -44,7 +44,6 @@ import { TimerComponent } from '../timer/timer.component';
         <div class="rounded-[28px] bg-hero-glow p-6 text-white">
           <p class="text-xs uppercase tracking-[0.24em] text-gold">Niveau atteint</p>
           <h2 class="mt-2 font-display text-3xl">{{ quizService.result()?.levelTitle }}</h2>
-          <p class="mt-3 text-lg">{{ quizService.result()?.badge }}</p>
           @if (quizService.result()?.pendingSync) {
             <p class="mt-4 text-sm text-white/75">
               Aucun reseau au moment de l'envoi: le score sera synchronise automatiquement des le retour en ligne.
@@ -185,10 +184,6 @@ import { TimerComponent } from '../timer/timer.component';
               <div class="rounded-[24px] bg-ink/5 p-4">
                 <p class="text-xs uppercase tracking-[0.18em] text-ink/45">Niveau actuel</p>
                 <p class="mt-2 font-display text-xl text-royal">{{ progressService.profile()?.levelTitle ?? 'Reveur Novice' }}</p>
-              </div>
-              <div class="rounded-[24px] bg-ink/5 p-4">
-                <p class="text-xs uppercase tracking-[0.18em] text-ink/45">Badge</p>
-                <p class="mt-2 text-lg font-bold text-gold">{{ progressService.profile()?.badge ?? '🥉 Reveur' }}</p>
               </div>
             </div>
           </div>

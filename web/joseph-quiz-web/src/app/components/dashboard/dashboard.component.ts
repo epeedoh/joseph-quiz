@@ -354,7 +354,12 @@ export class DashboardComponent {
     const nextSelection = { ...this.selection(), pseudo: this.pseudo.trim(), mode };
     this.selection.set(nextSelection);
     this.closeLaunchHelp();
-    await this.quizService.start(nextSelection);
+    const started = await this.quizService.start(nextSelection);
+    if (!started) {
+      this.saveState.set('error');
+      this.saveMessage.set("Aucune question n'a ete trouvee pour cette selection. Ajuste le chapitre ou la plage puis relance.");
+      return;
+    }
     await this.router.navigateByUrl('/quiz');
   }
 
@@ -372,7 +377,12 @@ export class DashboardComponent {
     }
 
     this.selection.set(baseSelection);
-    await this.quizService.start(baseSelection);
+    const started = await this.quizService.start(baseSelection);
+    if (!started) {
+      this.saveState.set('error');
+      this.saveMessage.set("Aucune question n'a ete trouvee pour cette recommandation.");
+      return;
+    }
     await this.router.navigateByUrl('/quiz');
   }
 

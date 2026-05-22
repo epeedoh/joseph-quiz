@@ -140,7 +140,7 @@ export class QuizService {
     window.addEventListener('online', () => void this.syncPendingSubmissions());
   }
 
-  async start(selection: QuizSelection): Promise<void> {
+  async start(selection: QuizSelection): Promise<boolean> {
     this.loading.set(true);
     this.selection.set(selection);
     this.mode.set(selection.mode);
@@ -163,6 +163,8 @@ export class QuizService {
     } finally {
       this.loading.set(false);
     }
+
+    return this.questions().length > 0;
   }
 
   answerCurrentQuestion(selectedOption: string, responseTimeMs: number): void {
