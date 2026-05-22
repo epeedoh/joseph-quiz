@@ -19,7 +19,7 @@ import { ChapterSelectorComponent } from '../chapter-selector/chapter-selector.c
           <div class="max-w-2xl">
             <p class="gold-chip bg-white/10 text-gold">Genese 37 a 50 - Louis Segond 1910</p>
             <h1 class="mt-5 max-w-xl font-display text-4xl leading-tight sm:text-5xl">
-              Forme-toi pour te distinguer, mobile et hors ligne.
+              Exerce-toi pour te distinguer
             </h1>
             <p class="mt-5 max-w-xl text-base text-white/80 sm:text-lg">
               Revision intelligente, mode competition
