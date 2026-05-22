@@ -70,11 +70,17 @@ export class ProgressService {
     this.pseudo.set(normalized);
 
     const currentProfile = this.profile();
-    if (!currentProfile || currentProfile.pseudo.toLowerCase() !== normalized.toLowerCase()) {
-      const placeholder = this.createEmptyProfile(normalized);
-      this.profile.set(placeholder);
-      void this.offlineCache.write(this.profileKey(normalized), placeholder);
+    if (currentProfile?.pseudo.toLowerCase() === normalized.toLowerCase()) {
+      this.profile.set({ ...currentProfile, pseudo: normalized });
+      return;
     }
+
+    if (!currentProfile) {
+      this.profile.set(this.createEmptyProfile(normalized));
+      return;
+    }
+
+    this.profile.set(this.createEmptyProfile(normalized));
   }
 
   async loadProfile(): Promise<void> {
@@ -99,9 +105,12 @@ export class ProgressService {
       if (cachedProfile) {
         this.profile.set(cachedProfile);
       } else {
-        const placeholder = this.createEmptyProfile(currentPseudo);
-        this.profile.set(placeholder);
-        await this.offlineCache.write(cacheKey, placeholder);
+        const currentProfile = this.profile();
+        if (currentProfile?.pseudo.trim().toLowerCase() === currentPseudo.toLowerCase()) {
+          this.profile.set(currentProfile);
+        } else {
+          this.profile.set(this.createEmptyProfile(currentPseudo));
+        }
       }
     } finally {
       this.loading.set(false);
@@ -130,21 +139,27 @@ export class ProgressService {
   }
 
   async applyOptimisticResult(result: QuizResult): Promise<void> {
-    const current = this.profile();
-    if (!current) {
-      await this.loadProfile();
+    const pseudo = this.pseudo().trim();
+    if (!pseudo) {
       return;
     }
 
+    const current = this.profile() ?? this.createEmptyProfile(pseudo);
+    const normalizedCurrent = current.pseudo.trim().toLowerCase();
+    const baseProfile = normalizedCurrent === pseudo.toLowerCase()
+      ? current
+      : this.createEmptyProfile(pseudo);
+
     const updated: ProfileSummary = {
-      ...current,
-      totalXp: current.totalXp + result.xpEarned,
-      totalScore: current.totalScore + result.score,
-      bestCombo: Math.max(current.bestCombo, result.maxCombo),
+      ...baseProfile,
+      totalXp: baseProfile.totalXp + result.xpEarned,
+      totalScore: baseProfile.totalScore + result.score,
+      bestCombo: Math.max(baseProfile.bestCombo, result.maxCombo),
       levelTitle: result.levelTitle,
       badge: result.badge,
+      accuracy: result.accuracy,
       recommendations: result.recommendations,
-      recentScores: current.recentScores
+      recentScores: baseProfile.recentScores
     };
 
     this.profile.set(updated);

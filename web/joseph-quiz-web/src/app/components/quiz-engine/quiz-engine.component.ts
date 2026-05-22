@@ -129,9 +129,6 @@ import { TimerComponent } from '../timer/timer.component';
               </p>
               <div class="mt-4 flex flex-wrap gap-3">
                 <span class="rounded-full bg-white/85 px-4 py-2 text-sm font-extrabold text-royal">+{{ feedback.scoreEarned }} points</span>
-                @if (feedback.isFast) {
-                  <span class="rounded-full bg-teal/10 px-4 py-2 text-sm font-bold text-teal">Bonus rapidite</span>
-                }
               </div>
               <p class="mt-3 text-sm font-semibold text-ink">
                 Verset cle: {{ feedback.verseReference }}
@@ -232,8 +229,9 @@ export class QuizEngineComponent {
   }
 
   async resetAndGoHome(): Promise<void> {
+    await this.progressService.refreshProfile();
     this.quizService.reset();
-    await this.router.navigateByUrl('/');
+    await this.router.navigateByUrl('/dashboard');
   }
 
   async retryRecommendation(recommendation: { title: string; description: string; zone: number | null; chapterStart: number | null; chapterEnd: number | null; focus: string }): Promise<void> {
