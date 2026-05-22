@@ -217,7 +217,7 @@ export class QuizService {
 
       if (result) {
         this.result.set(result);
-        await this.progressService.loadProfile();
+        await this.progressService.refreshProfile();
       }
     } catch {
       await this.offlineCache.enqueue({ endpoint, payload });
@@ -230,10 +230,7 @@ export class QuizService {
   }
 
   async syncPendingSubmissions(): Promise<void> {
-    await this.offlineCache.drain(async (item: PendingSyncItem) => {
-      await this.http.post(`${environment.apiBaseUrl}/${item.endpoint}`, item.payload).toPromise();
-    });
-
+    await this.progressService.syncPendingSubmissions();
     await this.progressService.loadProfile();
   }
 

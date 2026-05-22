@@ -27,23 +27,23 @@ import { TimerComponent } from '../timer/timer.component';
             <p class="text-xs uppercase tracking-[0.18em] text-white/70">Score</p>
             <p class="mt-2 text-3xl font-extrabold">{{ quizService.result()?.score }}</p>
           </div>
-          <div class="rounded-[24px] bg-gold/15 p-5">
-            <p class="text-xs uppercase tracking-[0.18em] text-ink/55">XP gagnes</p>
-            <p class="mt-2 text-3xl font-extrabold text-gold">+{{ quizService.result()?.xpEarned }}</p>
-          </div>
           <div class="rounded-[24px] bg-ink/5 p-5">
             <p class="text-xs uppercase tracking-[0.18em] text-ink/55">Precision</p>
             <p class="mt-2 text-3xl font-extrabold text-ink">{{ ((quizService.result()?.accuracy ?? 0) * 100) | number:'1.0-0' }}%</p>
           </div>
-          <div class="rounded-[24px] bg-wine/10 p-5">
-            <p class="text-xs uppercase tracking-[0.18em] text-ink/55">Combo max</p>
-            <p class="mt-2 text-3xl font-extrabold text-wine">{{ quizService.result()?.maxCombo }}</p>
+          <div class="rounded-[24px] bg-ink/5 p-5">
+            <p class="text-xs uppercase tracking-[0.18em] text-ink/55">Bonnes reponses</p>
+            <p class="mt-2 text-3xl font-extrabold text-ink">{{ quizService.result()?.correctAnswers }}/{{ quizService.result()?.totalQuestions }}</p>
+          </div>
+          <div class="rounded-[24px] bg-ink/5 p-5">
+            <p class="text-xs uppercase tracking-[0.18em] text-ink/55">Mode</p>
+            <p class="mt-2 text-3xl font-extrabold text-ink">{{ quizService.mode() === 'competition' ? 'Chrono' : 'Revision' }}</p>
           </div>
         </div>
 
         <div class="rounded-[28px] bg-hero-glow p-6 text-white">
-          <p class="text-xs uppercase tracking-[0.24em] text-gold">Niveau atteint</p>
-          <h2 class="mt-2 font-display text-3xl">{{ quizService.result()?.levelTitle }}</h2>
+          <p class="text-xs uppercase tracking-[0.24em] text-gold">Session enregistree</p>
+          <h2 class="mt-2 font-display text-3xl">Resultat sauvegarde pour {{ progressService.pseudo() || 'ton profil' }}</h2>
           @if (quizService.result()?.pendingSync) {
             <p class="mt-4 text-sm text-white/75">
               Aucun reseau au moment de l'envoi: le score sera synchronise automatiquement des le retour en ligne.
@@ -129,12 +129,8 @@ import { TimerComponent } from '../timer/timer.component';
               </p>
               <div class="mt-4 flex flex-wrap gap-3">
                 <span class="rounded-full bg-white/85 px-4 py-2 text-sm font-extrabold text-royal">+{{ feedback.scoreEarned }} points</span>
-                <span class="rounded-full bg-gold/15 px-4 py-2 text-sm font-extrabold text-gold">+{{ feedback.xpEarned }} XP</span>
                 @if (feedback.isFast) {
                   <span class="rounded-full bg-teal/10 px-4 py-2 text-sm font-bold text-teal">Bonus rapidite</span>
-                }
-                @if (feedback.comboAfterAnswer >= 2) {
-                  <span class="rounded-full bg-wine/10 px-4 py-2 text-sm font-bold text-wine">Combo x{{ feedback.comboAfterAnswer }}</span>
                 }
               </div>
               <p class="mt-3 text-sm font-semibold text-ink">
@@ -182,8 +178,8 @@ import { TimerComponent } from '../timer/timer.component';
                 <p class="mt-2 text-2xl font-extrabold text-royal">{{ quizService.liveScore() }}</p>
               </div>
               <div class="rounded-[24px] bg-ink/5 p-4">
-                <p class="text-xs uppercase tracking-[0.18em] text-ink/45">Niveau actuel</p>
-                <p class="mt-2 font-display text-xl text-royal">{{ progressService.profile()?.levelTitle ?? 'Reveur Novice' }}</p>
+                <p class="text-xs uppercase tracking-[0.18em] text-ink/45">Bonnes reponses</p>
+                <p class="mt-2 font-display text-xl text-royal">{{ quizService.correctCount() }}</p>
               </div>
             </div>
           </div>

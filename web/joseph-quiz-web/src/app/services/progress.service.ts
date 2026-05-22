@@ -3,7 +3,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 
 import { environment } from '../../environments/environment';
 import { OfflineCacheService } from './offline-cache.service';
-import { ProfileSummary, QuizResult } from '../core/models/quiz.models';
+import { PendingSyncItem, ProfileSummary, QuizResult } from '../core/models/quiz.models';
 
 const PSEUDO_KEY = 'jq:pseudo';
 const LEGACY_PROFILE_KEY = 'jq:profile';
@@ -13,6 +13,7 @@ const PROFILE_KEY_PREFIX = 'jq:profile:';
 export class ProgressService {
   private readonly http = inject(HttpClient);
   private readonly offlineCache = inject(OfflineCacheService);
+  private refreshPromise: Promise<void> | null = null;
 
   readonly pseudo = signal<string>(localStorage.getItem(PSEUDO_KEY) ?? '');
   readonly profile = signal<ProfileSummary | null>(null);
@@ -43,9 +44,16 @@ export class ProgressService {
   constructor() {
     window.addEventListener('online', () => this.online.set(true));
     window.addEventListener('offline', () => this.online.set(false));
+    window.addEventListener('online', () => void this.refreshProfile());
+    window.addEventListener('focus', () => void this.refreshProfile());
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        void this.refreshProfile();
+      }
+    });
 
     if (this.pseudo()) {
-      void this.loadProfile();
+      void this.refreshProfile();
     }
   }
 
@@ -100,6 +108,27 @@ export class ProgressService {
     }
   }
 
+  async refreshProfile(): Promise<void> {
+    if (!this.pseudo().trim()) {
+      return;
+    }
+
+    if (this.refreshPromise) {
+      return this.refreshPromise;
+    }
+
+    this.refreshPromise = (async () => {
+      await this.syncPendingSubmissions();
+      await this.loadProfile();
+    })();
+
+    try {
+      await this.refreshPromise;
+    } finally {
+      this.refreshPromise = null;
+    }
+  }
+
   async applyOptimisticResult(result: QuizResult): Promise<void> {
     const current = this.profile();
     if (!current) {
@@ -120,6 +149,12 @@ export class ProgressService {
 
     this.profile.set(updated);
     await this.offlineCache.write(this.profileKey(updated.pseudo), updated);
+  }
+
+  async syncPendingSubmissions(): Promise<void> {
+    await this.offlineCache.drain(async (item: PendingSyncItem) => {
+      await this.http.post(`${environment.apiBaseUrl}/${item.endpoint}`, item.payload).toPromise();
+    });
   }
 
   private profileKey(pseudo: string): string {

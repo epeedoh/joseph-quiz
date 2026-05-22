@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, OnInit, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
@@ -67,13 +67,16 @@ import { ChapterSelectorComponent } from '../chapter-selector/chapter-selector.c
             </div>
 
             <div class="glass-card bg-white/10 p-5 text-white">
-              <p class="text-xs uppercase tracking-[0.25em] text-gold">Tunique-o-metre</p>
-              <div class="mt-3 h-4 overflow-hidden rounded-full bg-white/15">
-                <div class="tunique-bar h-full animate-shimmer rounded-full" [style.width.%]="progressService.tuniqueProgress()"></div>
-              </div>
-              <div class="mt-4 flex items-center justify-between text-sm">
-                <span>{{ progressService.profile()?.badge ?? '🥉 Reveur' }}</span>
-                <span>{{ progressService.profile()?.totalXp ?? 0 }} XP</span>
+              <p class="text-xs uppercase tracking-[0.25em] text-gold">Tableau express</p>
+              <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+                <div class="rounded-2xl bg-white/10 p-4">
+                  <p class="text-white/65">Score total</p>
+                  <p class="mt-2 text-2xl font-extrabold">{{ progressService.profile()?.totalScore ?? 0 }}</p>
+                </div>
+                <div class="rounded-2xl bg-white/10 p-4">
+                  <p class="text-white/65">Precision</p>
+                  <p class="mt-2 text-2xl font-extrabold">{{ ((progressService.profile()?.accuracy ?? 0) * 100) | number:'1.0-0' }}%</p>
+                </div>
               </div>
             </div>
           </div>
@@ -124,8 +127,8 @@ import { ChapterSelectorComponent } from '../chapter-selector/chapter-selector.c
 
         <div class="mt-6 grid gap-3 sm:grid-cols-2">
           <div class="rounded-[24px] bg-ink/5 p-4">
-            <p class="text-xs uppercase tracking-[0.18em] text-ink/55">Niveau</p>
-            <p class="mt-2 font-display text-xl text-royal">{{ progressService.profile()?.levelTitle ?? 'Reveur Novice' }}</p>
+            <p class="text-xs uppercase tracking-[0.18em] text-ink/55">Mode actif</p>
+            <p class="mt-2 font-display text-xl text-royal">{{ selection().mode === 'competition' ? 'Competition' : 'Revision' }}</p>
           </div>
           <div class="rounded-[24px] bg-ink/5 p-4">
             <p class="text-xs uppercase tracking-[0.18em] text-ink/55">Equipe</p>
@@ -262,7 +265,7 @@ import { ChapterSelectorComponent } from '../chapter-selector/chapter-selector.c
     </button>
   `
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   readonly progressService = inject(ProgressService);
   private readonly quizService = inject(QuizService);
   private readonly router = inject(Router);
@@ -311,6 +314,10 @@ export class DashboardComponent {
         this.selection.update((selection) => ({ ...selection, pseudo: '' }));
       }
     });
+  }
+
+  async ngOnInit(): Promise<void> {
+    await this.progressService.refreshProfile();
   }
 
   async savePseudo(): Promise<boolean> {
@@ -410,7 +417,7 @@ export class DashboardComponent {
       );
     }
 
-    await this.progressService.loadProfile();
+    await this.progressService.refreshProfile();
     return true;
   }
 }

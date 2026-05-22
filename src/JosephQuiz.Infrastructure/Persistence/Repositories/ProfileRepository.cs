@@ -10,7 +10,9 @@ public sealed class ProfileRepository(JosephQuizDbContext dbContext) : IProfileR
         => await dbContext.Profiles
             .Include(profile => profile.TeamMemberships)
             .ThenInclude(membership => membership.Team)
-            .FirstOrDefaultAsync(profile => profile.Pseudo == pseudo.Trim(), cancellationToken);
+            .FirstOrDefaultAsync(
+                profile => profile.Pseudo.ToLower() == pseudo.Trim().ToLower(),
+                cancellationToken);
 
     public async Task<Profile> GetOrCreateAsync(string pseudo, CancellationToken cancellationToken)
     {
