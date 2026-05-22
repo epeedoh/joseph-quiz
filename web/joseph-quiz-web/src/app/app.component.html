@@ -1,14 +1,14 @@
 <div class="min-h-screen bg-parchment text-ink">
   <div class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-ink/85 backdrop-blur-xl">
-    <div class="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4" [class.py-2]="isQuizRoute()" [class.py-3]="!isQuizRoute()">
+    <div class="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4" [class.py-1.5]="isQuizRoute()" [class.py-3]="!isQuizRoute()">
       <a routerLink="/" class="flex min-w-0 items-center gap-3 text-white">
         <div class="rounded-[22px] bg-white/95 px-2 py-1 shadow-sm ring-1 ring-gold/30">
           <img
             src="assets/brand/vh-logo.png"
             alt="Vases d'Honneur"
             class="object-contain"
-            [class.h-9]="isQuizRoute()"
-            [class.w-[70px]]="isQuizRoute()"
+            [class.h-8]="isQuizRoute()"
+            [class.w-[62px]]="isQuizRoute()"
             [class.h-11]="!isQuizRoute()"
             [class.w-[82px]]="!isQuizRoute()"
             [class.sm:h-12]="!isQuizRoute()"
@@ -17,8 +17,8 @@
         </div>
 
         <div class="min-w-0">
-          <p class="truncate font-display tracking-[0.24em] text-gold" [class.text-base]="isQuizRoute()" [class.text-lg]="!isQuizRoute()">JOSEPH QUIZ</p>
-          <p class="truncate uppercase tracking-[0.28em] text-white/60" [class.text-[10px]]="isQuizRoute()" [class.text-xs]="!isQuizRoute()">Vases d'Honneur</p>
+          <p class="truncate font-display tracking-[0.2em] text-gold" [class.text-sm]="isQuizRoute()" [class.text-lg]="!isQuizRoute()">JOSEPH QUIZ</p>
+          <p class="truncate uppercase tracking-[0.24em] text-white/60" [class.hidden]="isQuizRoute()" [class.text-xs]="!isQuizRoute()">Vases d'Honneur</p>
         </div>
       </a>
 
@@ -71,8 +71,8 @@
             src="assets/brand/dd-logo-bleu.png"
             alt="Distinction Divine"
             class="object-contain"
-            [class.h-8]="isQuizRoute()"
-            [class.w-[60px]]="isQuizRoute()"
+            [class.h-7]="isQuizRoute()"
+            [class.w-[52px]]="isQuizRoute()"
             [class.h-10]="!isQuizRoute()"
             [class.w-[72px]]="!isQuizRoute()"
             [class.sm:h-12]="!isQuizRoute()"

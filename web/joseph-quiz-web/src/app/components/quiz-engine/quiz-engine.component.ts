@@ -75,12 +75,12 @@ import { TimerComponent } from '../timer/timer.component';
         <a routerLink="/" class="mx-auto inline-flex rounded-full bg-royal px-5 py-3 text-sm font-extrabold uppercase tracking-[0.18em] text-white">Retour</a>
       </section>
     } @else {
-      <section class="grid gap-6 xl:grid-cols-[0.74fr_0.26fr]">
-        <article class="glass-card overflow-hidden p-6 sm:p-8">
+      <section class="grid gap-5 xl:grid-cols-[0.74fr_0.26fr]">
+        <article class="glass-card overflow-hidden p-5 sm:p-8">
           <div class="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p class="gold-chip">{{ quizService.mode() === 'competition' ? 'Mode competition' : 'Mode revision' }}</p>
-              <h1 class="mt-4 font-display text-3xl text-royal">
+              <h1 class="mt-3 font-display text-[2rem] leading-none text-royal sm:mt-4 sm:text-3xl">
                 Question {{ quizService.currentIndex() + 1 }} / {{ quizService.questions().length }}
               </h1>
             </div>
@@ -95,24 +95,64 @@ import { TimerComponent } from '../timer/timer.component';
             </div>
           </div>
 
+          <div class="mt-4 grid gap-3 xl:hidden">
+            <div class="rounded-[24px] bg-hero-glow px-4 py-4 text-white shadow-card">
+              <p class="text-[11px] uppercase tracking-[0.18em] text-gold">Joueur</p>
+              <div class="mt-2 flex items-center justify-between gap-3">
+                <div>
+                  <p class="font-display text-2xl">{{ progressService.pseudo() || 'Invite' }}</p>
+                  <p class="mt-1 text-sm text-white/70">
+                    {{ progressService.profile()?.teamName ? 'Equipe: ' + progressService.profile()?.teamName : 'Aucune equipe liee' }}
+                  </p>
+                </div>
+
+                @if (quizService.mode() === 'competition' && quizService.selection(); as currentSelection) {
+                  <div class="shrink-0">
+                    <app-timer
+                      [durationSeconds]="currentSelection.timerSeconds"
+                      [resetToken]="quizService.currentIndex()"
+                      [paused]="!!quizService.feedback() || !!quizService.result()"
+                      (remainingMsChange)="remainingMs.set($event)"
+                      (expired)="handleExpired()"/>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3">
+              <div class="rounded-[22px] bg-ink/5 p-4">
+                <p class="text-[11px] uppercase tracking-[0.16em] text-ink/45">Reponses</p>
+                <p class="mt-2 text-2xl font-extrabold text-ink">{{ quizService.answeredCount() }}/{{ quizService.questions().length }}</p>
+              </div>
+              <div class="rounded-[22px] bg-ink/5 p-4">
+                <p class="text-[11px] uppercase tracking-[0.16em] text-ink/45">Score</p>
+                <p class="mt-2 text-2xl font-extrabold text-royal">{{ quizService.liveScore() }}</p>
+              </div>
+              <div class="rounded-[22px] bg-ink/5 p-4">
+                <p class="text-[11px] uppercase tracking-[0.16em] text-ink/45">Justes</p>
+                <p class="mt-2 text-2xl font-extrabold text-royal">{{ quizService.correctCount() }}</p>
+              </div>
+            </div>
+          </div>
+
           @if (quizService.currentQuestion(); as question) {
-            <div class="mt-8 rounded-[32px] bg-gradient-to-br from-white to-gold/10 p-6">
+            <div class="mt-5 rounded-[28px] bg-gradient-to-br from-white to-gold/10 p-5 sm:mt-8 sm:rounded-[32px] sm:p-6">
               <div class="flex flex-wrap items-center gap-3 text-xs font-bold uppercase tracking-[0.18em] text-ink/55">
                 <span class="rounded-full bg-royal/10 px-3 py-1 text-royal">Chapitre {{ question.chapter }}</span>
                 <span class="rounded-full bg-gold/15 px-3 py-1 text-gold">{{ question.difficulty }}</span>
                 <span class="rounded-full bg-teal/10 px-3 py-1 text-teal">Zone {{ question.zone }}</span>
               </div>
-              <h2 class="mt-5 text-2xl font-display leading-snug text-ink sm:text-3xl">{{ question.text }}</h2>
+              <h2 class="mt-4 text-[2.1rem] font-display leading-[1.14] text-ink sm:mt-5 sm:text-3xl">{{ question.text }}</h2>
 
-              <div class="mt-6 grid gap-3">
+              <div class="mt-5 grid gap-3 sm:mt-6">
                 @for (option of question.options; track option.key) {
                   <button
                     type="button"
                     [disabled]="!!quizService.feedback()"
                     (click)="selectOption(option.key)"
-                    class="rounded-[24px] border px-5 py-4 text-left text-sm font-semibold transition sm:text-base"
+                    class="rounded-[22px] border px-4 py-4 text-left text-sm font-semibold leading-7 transition sm:rounded-[24px] sm:px-5 sm:text-base"
                     [ngClass]="optionClass(option.key)">
-                    <span class="mr-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/85 text-xs font-extrabold text-royal">
+                    <span class="mr-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/85 text-xs font-extrabold text-royal sm:h-9 sm:w-9">
                       {{ option.key }}
                     </span>
                     {{ option.text }}
@@ -123,7 +163,7 @@ import { TimerComponent } from '../timer/timer.component';
           }
 
           @if (quizService.feedback(); as feedback) {
-            <div class="mt-6 rounded-[28px] border p-6" [class.border-emerald-200]="feedback.isCorrect" [class.bg-emerald-50]="feedback.isCorrect" [class.border-rose-200]="!feedback.isCorrect" [class.bg-rose-50]="!feedback.isCorrect">
+          <div class="mt-5 rounded-[24px] border p-5 sm:mt-6 sm:rounded-[28px] sm:p-6" [class.border-emerald-200]="feedback.isCorrect" [class.bg-emerald-50]="feedback.isCorrect" [class.border-rose-200]="!feedback.isCorrect" [class.bg-rose-50]="!feedback.isCorrect">
               <p class="text-xs font-bold uppercase tracking-[0.18em]" [class.text-emerald-700]="feedback.isCorrect" [class.text-rose-700]="!feedback.isCorrect">
                 {{ feedback.isCorrect ? 'Bonne reponse' : 'A renforcer' }}
               </p>
@@ -145,7 +185,7 @@ import { TimerComponent } from '../timer/timer.component';
           }
         </article>
 
-        <aside class="space-y-4">
+        <aside class="hidden space-y-4 xl:block">
           <div class="rounded-[30px] bg-hero-glow p-5 text-white shadow-card">
             <p class="text-xs uppercase tracking-[0.18em] text-gold">Joueur</p>
             <h3 class="mt-3 font-display text-2xl">{{ progressService.pseudo() || 'Invite' }}</h3>
